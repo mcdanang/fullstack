@@ -3,7 +3,6 @@ import {
   Box,
   FormControl,
   FormLabel,
-  Input,
   Checkbox,
   Stack,
   Link,
@@ -13,28 +12,70 @@ import {
 } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
 import axios from "axios";
+import Swal from "sweetalert2";
+import { Formik, Form, Field, ErrorMessage } from "formik";
+import * as Yup from "yup";
 
 export const LoginForm = () => {
     const navigate = useNavigate()
 
-    const onLogin = () => {
+    const LoginSchema = Yup.object().shape({
+      email: Yup.string()
+        .email("Invalid email address format")
+        .required("Email is required"),
+      password: Yup.string()
+        .min(4, "Password must be 4 characters at minimum")
+        .required("Password is required"),
+    });
+
+    const onLogin = async (values) => {
         try {
-            const data = {
-                email: document.getElementById("email").value,
-                password: document.getElementById("password").value
-            }
-    
-            console.log(data);
-            axios.post('http://localhost:2000/user/login', data)
-              .then( res => console.log(res.data))
-              .catch( err => console.log(err))
-            document.getElementById("email").value = ""
-            document.getElementById("password").value = ""
+            const data = values;
+
+            const result = await axios.post('http://localhost:2000/user/login', data);
+
+            Swal.fire({
+              icon: "success",
+              title: result.data.message,
+              showConfirmButton: false,
+              timer: 1500,
+            });
+
+            localStorage.setItem("token", result.data.token);
+
+            setTimeout(() => {
+              navigate("/");
+            }, 1500);
+
         } catch (err) {
             console.log(err);
+            if (err.response.data) {
+              Swal.fire({
+                icon: "error",
+                title: err.response.data.message,
+                showConfirmButton: false,
+                timer: 1500,
+              });
+            } else {
+              Swal.fire({
+                icon: "error",
+                title: err.response.data.errors[0].message,
+                showConfirmButton: false,
+                timer: 1500,
+              });
+            }
         }
       }
+  
+  const inputStyle = {
+    border: '1px solid #E2E8F0',
+    borderRadius: '0.375rem',
+    padding: '7px 16px',
+    width: '100%'
+  }
 
+  const errorStyle = { color: "red", fontSize: "12px", marginTop: "0px" };
+    
   return (
     <Flex
       minH={"100vh"}
@@ -52,38 +93,58 @@ export const LoginForm = () => {
           boxShadow={"lg"}
           p={8}
         >
-          <Stack spacing={4}>
-            <FormControl id="email">
-              <FormLabel>Email address</FormLabel>
-              <Input type="email" />
-            </FormControl>
-            <FormControl id="password">
-              <FormLabel>Password</FormLabel>
-              <Input type="password" />
-            </FormControl>
-            <Stack spacing={10}>
-              <Stack
-                direction={{ base: "column", sm: "row" }}
-                align={"start"}
-                justify={"space-between"}
-              >
-                <Checkbox>Remember me</Checkbox>
-                <Link onClick={() => navigate("/")} color={"blue.400"}>
-                  Back to home
-                </Link>
-              </Stack>
-              <Button
-                bg={"blue.400"}
-                color={"white"}
-                _hover={{
-                  bg: "blue.500",
-                }}
-                onClick={onLogin}
-              >
-                Sign in
-              </Button>
-            </Stack>
-          </Stack>
+
+          <Formik
+            initialValues={{ firstName: "", lastName: "", email: "", password: "", }}
+            validationSchema={LoginSchema}
+            onSubmit={(values, {resetForm}) => {
+              onLogin(values);
+              resetForm();
+            }}
+          >
+            {(props) => {
+              return (
+                <Form>
+                  <Stack spacing={4}>
+                    <FormControl id="email">
+                      <FormLabel>Email address</FormLabel>
+                      <Field type="text" name="email" style={inputStyle}/>
+                      <ErrorMessage component="div" name="email" style={errorStyle} />
+                    </FormControl>
+                    <FormControl id="password">
+                      <FormLabel>Password</FormLabel>
+                      <Field type="password" name="password" style={inputStyle}/>
+                      <ErrorMessage component="div" name="password" style={errorStyle} />
+                    </FormControl>
+                    <Stack spacing={10}>
+                      <Stack
+                        direction={{ base: "column", sm: "row" }}
+                        align={"start"}
+                        justify={"space-between"}
+                      >
+                        <Checkbox>Remember me</Checkbox>
+                        <Link onClick={() => navigate("/")} color={"blue.400"}>
+                          Back to home
+                        </Link>
+                      </Stack>
+                      <Button
+                        bg={"blue.400"}
+                        color={"white"}
+                        _hover={{
+                          bg: "blue.500",
+                        }}
+                        // onClick={onLogin}
+                        type="submit"
+                      >
+                        Sign in
+                      </Button>
+                    </Stack>
+                  </Stack>
+                </Form>
+              )
+            }}
+          </Formik>
+          
         </Box>
       </Stack>
     </Flex>

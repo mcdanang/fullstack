@@ -7,15 +7,27 @@ module.exports = {
   register: async (req, res) => {
     try {
       const { firstName, lastName, email, password } = req.body;
+
+      const userExist = await user.findOne({
+        where: {
+          email
+        }
+      })
+      if (userExist) throw {
+        status: false,
+        message: `Email is already exist`
+      }
+
       const salt = await bcrypt.genSalt(10);
       const hashPass = await bcrypt.hash(password, salt);
-
+      
       const data = await user.create({
         firstName,
         lastName,
         email,
         password: hashPass
       });
+  
       res.status(200).send({
         status: true,
         message: "Register success",
@@ -23,10 +35,7 @@ module.exports = {
       })
     } catch (err) {
       console.log(err);
-      res.status(400).send({
-        status: false,
-        message: "Lengkapi Data"
-      });
+      res.status(400).send(err);
     }
   },
   login: async (req, res) => {
