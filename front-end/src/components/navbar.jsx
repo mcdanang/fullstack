@@ -1,12 +1,17 @@
 import { Button, Flex, VStack, Menu, MenuButton, Avatar, MenuList, MenuItem, Text } from "@chakra-ui/react";
 import { useNavigate } from "react-router-dom";
+import { useSelector, useDispatch } from 'react-redux';
+import { removeUserData } from "../redux/userSlice.js"
 
 export const Navbar = () => {
   const navigate = useNavigate();
+  const userData = useSelector((state) => state.user.value);
+  const dispatch = useDispatch();
   const token = localStorage.getItem("token");
 
   const onSignOut = () => {
     localStorage.removeItem("token")
+    dispatch(removeUserData());
     navigate("/login")
   }
 
@@ -23,12 +28,12 @@ export const Navbar = () => {
                 mr="2"
               />
               <MenuList>
-                <MenuItem>Profile</MenuItem>
-                <MenuItem>Setting</MenuItem>
+                <MenuItem onClick={() => navigate("/")}>Home</MenuItem>
+                <MenuItem onClick={() => navigate("/profile")}>Profile</MenuItem>
                 <MenuItem onClick={onSignOut}>Sign Out</MenuItem>
               </MenuList>
             </Menu>
-            <Text as="b">User Login</Text>
+            <Text as="b">Welcome, {userData.firstName}</Text>
           </>
         ) : (
           <>

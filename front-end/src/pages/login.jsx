@@ -15,9 +15,12 @@ import axios from "axios";
 import Swal from "sweetalert2";
 import { Formik, Form, Field, ErrorMessage } from "formik";
 import * as Yup from "yup";
+import { useDispatch } from 'react-redux';
+import { setUserData } from '../redux/userSlice'
 
 export const LoginForm = () => {
-    const navigate = useNavigate()
+    const navigate = useNavigate();
+    const dispatch = useDispatch();
 
     const LoginSchema = Yup.object().shape({
       email: Yup.string()
@@ -42,6 +45,8 @@ export const LoginForm = () => {
             });
 
             localStorage.setItem("token", result.data.token);
+
+            dispatch(setUserData(result.data.data));
 
             setTimeout(() => {
               navigate("/");

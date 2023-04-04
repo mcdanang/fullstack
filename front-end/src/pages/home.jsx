@@ -8,6 +8,6 @@ export const HomePage = () => {
       <Navbar />
       <Heroes />
       <Outlet />
-  </div>
+    </div>
   );
 };

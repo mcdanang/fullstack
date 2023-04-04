@@ -71,7 +71,8 @@ module.exports = {
           id: userExist.id,
           email: userExist.email,
           firstName: userExist.firstName,
-          lastName: userExist.lastName
+          lastName: userExist.lastName,
+          isAdmin: userExist.isAdmin
         },
         token
       })
