@@ -21,6 +21,7 @@ module.exports = {
       
       if (!event_id || !ticket_qty) throw "Please complete your form"
 
+      //logic if user can only buy max 3 tickets for one event
       // const ticketSum = await transaction.sum('ticket_qty', { where: { user_id, event_id } });
       // console.log(ticketSum);
       // if (ticketSum >= 3) throw 'You have reach limit 3 tickets'
