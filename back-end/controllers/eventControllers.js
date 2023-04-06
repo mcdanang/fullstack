@@ -2,6 +2,7 @@ const db = require("../models")
 const jwt = require("jsonwebtoken");
 const { Op } = require('sequelize');
 const event = db.Event;
+const user = db.User;
 
 module.exports = {
   addEvent: async (req, res) => {
@@ -46,6 +47,20 @@ module.exports = {
           }
         }
       })
+      res.status(200).send({
+        status: true,
+        data
+      })
+    } catch (err) {
+      console.log(err);
+      res.status(400).send(err);
+    }
+  },
+  showEventAttendances: async (req, res) => {
+    try {
+      const data = await event.findAll({
+        include: user
+      });
       res.status(200).send({
         status: true,
         data

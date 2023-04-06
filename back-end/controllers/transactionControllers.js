@@ -16,9 +16,13 @@ module.exports = {
       if (!token) throw "Unauthorized / Token expired"
       token = token.split(" ")[1];
 
-      const verifiedUser = jwt.verify(token, "JWT");
+      const user_id = jwt.verify(token, "JWT").id;
       
       if (!event_id || !ticket_qty) throw "Please complete your form"
+
+      const ticketSum = await transaction.sum('ticket_qty', { where: { user_id, event_id } });
+      console.log(ticketSum);
+      if (ticketSum + ticket_qty > 3) throw  `You can only buy ${3 - ticketSum} ticket(s)`
 
       const eventData = await event.findOne({
         where: {
@@ -29,7 +33,7 @@ module.exports = {
 
       const data = await transaction.create({
         ...req.body,
-        user_id: verifiedUser.id,
+        user_id,
         total_price
       });
   
@@ -49,9 +53,13 @@ module.exports = {
       if (!token) throw "Unauthorized / Token expired"
       token = token.split(" ")[1];
       const verifiedUser = jwt.verify(token, "JWT");
-      if (!verifiedUser.isAdmin) throw "Access denied: You are not admin"
+      // if (!verifiedUser.isAdmin) throw "Access denied: You are not admin"
 
-      const data = await transaction.findAll();
+      const data = await transaction.findAll({
+        where: {
+          user_id: verifiedUser.id
+        }
+      });
       res.status(200).send({
         status: true,
         data
