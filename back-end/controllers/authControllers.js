@@ -61,8 +61,8 @@ module.exports = {
       }
 
       //Create JWT
-      const payload = { id: userExist.id };
-      const token = jwt.sign(payload, "JWT", { expiresIn: "5m"});
+      const payload = { id: userExist.id, isAdmin: userExist.isAdmin };
+      const token = jwt.sign(payload, "JWT", { expiresIn: "24h"});
 
       res.status(200).send({
         status: true,

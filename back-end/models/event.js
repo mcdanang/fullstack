@@ -3,7 +3,7 @@ const {
   Model
 } = require('sequelize');
 module.exports = (sequelize, DataTypes) => {
-  class User extends Model {
+  class Event extends Model {
     /**
      * Helper method for defining associations.
      * This method is not a part of Sequelize lifecycle.
@@ -11,45 +11,47 @@ module.exports = (sequelize, DataTypes) => {
      */
     static associate(models) {
       // define association here
-      User.hasOne(models.Profile)
-      User.hasMany(models.Event, {
+      Event.belongsTo(models.User, {
         foreignKey: {
           name: "admin_id"
         }
       });
-      User.hasMany(models.Transaction, {
+      Event.hasMany(models.Transaction, {
         foreignKey: {
-          name: "user_id"
+          name: "event_id"
         }
       });
     }
   }
-  User.init({
-    firstName: {
-      type: DataTypes.STRING,
-      allowNull: false
-    },
-    lastName: {
-      type: DataTypes.STRING,
-      allowNull: false
-    },
-    email: {
+  Event.init({
+    name: {
       type: DataTypes.STRING,
       allowNull: false,
-      unique: true
     },
-    password: {
-      type: DataTypes.STRING,
-      allowNull: false
-    },
-    isAdmin: {
-      type: DataTypes.BOOLEAN,
+    date: {
+      type: DataTypes.DATEONLY,
       allowNull: false,
-      defaultValue: false
+    },
+    venue: {
+      type: DataTypes.STRING,
+      allowNull: false,
+    },
+    total_ticket: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    remaining_ticket: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+    },
+    price: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
     },
   }, {
     sequelize,
-    modelName: 'User',
+    modelName: 'Event',
+    timestamps: true
   });
-  return User;
+  return Event;
 };

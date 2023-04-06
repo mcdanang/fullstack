@@ -1,5 +1,7 @@
 const authControllers = require("./authControllers");
+const eventControllers = require("./eventControllers");
+const transactionControllers = require("./transactionControllers");
 
 module.exports = {
-  authControllers
+  authControllers, eventControllers, transactionControllers
 }

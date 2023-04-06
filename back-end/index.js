@@ -11,15 +11,17 @@ app.get("/", (req, res) => {
     res.send("This is my API")
 })
 
-const { authRouters } = require("./routers");
+const { authRouters, eventRouters, transactionRouters } = require("./routers");
 app.use("/user", authRouters);
+app.use("/event", eventRouters);
+app.use("/transaction", transactionRouters);
 
-app.get("/products/:id", (req, res) => {
-    res.send(`GET product with ID of ${req.params.id}`)
-})
-app.get("/products/categories", (req, res) => {
-    res.send(`GET product categories`)
-})
+// app.get("/products/:id", (req, res) => {
+//     res.send(`GET product with ID of ${req.params.id}`)
+// })
+// app.get("/products/categories", (req, res) => {
+//     res.send(`GET product categories`)
+// })
 
 app.listen(PORT, () => {
     // db.sequelize.sync({ alter: true })
