@@ -7,5 +7,6 @@ router.post("/create",
   transactionControllers.createTransaction
 );
 router.get("/show", transactionControllers.showTransactions);
+router.get("/attendances", transactionControllers.showAttendances);
 
 module.exports = router;

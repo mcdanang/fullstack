@@ -1,9 +1,10 @@
 const db = require("../models")
 const jwt = require("jsonwebtoken");
-const { Op } = require('sequelize');
+const { Op, Sequelize } = require('sequelize');
 const { validationResult } = require("express-validator");
 const transaction = db.Transaction;
 const event = db.Event;
+const user = db.User;
 
 module.exports = {
   createTransaction: async (req, res) => {
@@ -22,6 +23,7 @@ module.exports = {
 
       const ticketSum = await transaction.sum('ticket_qty', { where: { user_id, event_id } });
       console.log(ticketSum);
+      if (ticketSum >= 3) throw 'You have reach limit 3 tickets'
       if (ticketSum + ticket_qty > 3) throw  `You can only buy ${3 - ticketSum} ticket(s)`
 
       const eventData = await event.findOne({
@@ -69,5 +71,33 @@ module.exports = {
       console.log(err);
       res.status(400).send(err);
     }
-  }
+  },
+  showAttendances: async (req, res) => {
+    try {
+      let token = req.headers.authorization;
+      if (!token) throw "Unauthorized / Token expired"
+      token = token.split(" ")[1];
+      const verifiedUser = jwt.verify(token, "JWT");
+      if (!verifiedUser.isAdmin) throw "Access denied: You are not admin"
+
+      const [results, metadata] = await db.sequelize.query(`
+        SELECT fullstack.Events.name AS event_name, 
+        CONCAT(fullstack.Users.firstName, " ", fullstack.Users.lastName) AS name, 
+        SUM(fullstack.Transactions.ticket_qty) AS total_ticket
+        FROM fullstack.Transactions
+        INNER JOIN fullstack.Events ON fullstack.Transactions.event_id = fullstack.Events.id
+        INNER JOIN fullstack.Users ON fullstack.Transactions.user_id = fullstack.Users.id
+        GROUP BY fullstack.Events.name, fullstack.Users.id;
+      `)
+
+      res.status(200).send({
+        status: true,
+        results
+      })
+
+    } catch (err) {
+      console.log(err);
+      res.status(400).send(err);
+    }
+  },
 }
