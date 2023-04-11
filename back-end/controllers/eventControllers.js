@@ -37,7 +37,7 @@ module.exports = {
   showEvents: async (req, res) => {
     try {
       const data = await event.findAll({
-        attributes: ["name", "venue", "date", "total_ticket", "remaining_ticket", "price"],
+        attributes: ["name", "venue", "date", "total_ticket", "remaining_ticket", "price", "image"],
         where: {
           date: {
             [Op.gte]: new Date(),

@@ -7,12 +7,13 @@ module.exports = {
   register: async (req, res) => {
     try {
       const { firstName, lastName, email, password } = req.body;
-
+      // user.query(`SELECT email FROM users WHERE email = ${db.escape(email)};`);
       const userExist = await user.findOne({
         where: {
           email
         }
       })
+
       if (userExist) throw {
         status: false,
         message: `Email is already exist`

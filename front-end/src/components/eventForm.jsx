@@ -29,6 +29,7 @@ export const EventForm = () => {
     price: Yup.number()
       .min(0, "Minimum price is 0")
       .required("Price is required"),
+    image: Yup.string()
   });
 
   const submitNewEvent = async (values) => {
@@ -98,7 +99,7 @@ export const EventForm = () => {
         >
 
           <Formik
-            initialValues={{ name: "", date: "", venue: "", total_ticket: 1, price: 0 }}
+            initialValues={{ name: "", date: "", venue: "", total_ticket: 1, price: 0, image: "https://picsum.photos/300" }}
             validationSchema={EventSchema}
             onSubmit={(values, {resetForm}) => {
               submitNewEvent(values);
@@ -135,6 +136,11 @@ export const EventForm = () => {
                       <FormLabel>Price</FormLabel>
                       <Field type="number" name="price" style={inputStyle}/>
                       <ErrorMessage component="div" name="price" style={errorStyle} />
+                    </FormControl>
+                    <FormControl id="image" isRequired>
+                      <FormLabel>Event Image URL</FormLabel>
+                      <Field type="text" name="image" style={inputStyle}/>
+                      <ErrorMessage component="div" name="image" style={errorStyle} />
                     </FormControl>
                     <Stack spacing={10} pt={2}>
                       <Button

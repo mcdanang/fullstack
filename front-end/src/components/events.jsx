@@ -9,9 +9,7 @@ import {
 } from '@chakra-ui/react';
 import axios from "axios";
 import { useState, useEffect } from 'react';
-
-const IMAGE =
-  'https://picsum.photos/300';
+import { Ticketing } from "./ticketing";
 
 export function Events() {
   const [events, setEvents] = useState([]);
@@ -19,7 +17,7 @@ export function Events() {
   useEffect(() => {
     async function getEvents() {
       const eventData = await axios.get('http://localhost:2000/event/show') 
-      console.log(eventData.data.data) 
+      // console.log(eventData.data.data) 
       setEvents(eventData.data.data);
     }
     getEvents();
@@ -46,10 +44,11 @@ export function Events() {
         </Heading>
       </Stack>
       <Center py={12}>
-        <SimpleGrid columns={2} spacing={5}>
+        <SimpleGrid columns={[1, null, 2, null, 3]} spacing={5}>
         {events.map((event) => {
           return (
             <Box
+              key={event.name}
               role={'group'}
               p={6}
               maxW={'330px'}
@@ -73,7 +72,7 @@ export function Events() {
                   pos: 'absolute',
                   top: 5,
                   left: 0,
-                  backgroundImage: `url(${IMAGE})`,
+                  backgroundImage: `url(${event.image})`,
                   filter: 'blur(15px)',
                   zIndex: -1,
                 }}
@@ -87,7 +86,7 @@ export function Events() {
                   height={230}
                   width={282}
                   objectFit={'cover'}
-                  src={IMAGE}
+                  src={event.image}
                 />
               </Box>
               <Stack pt={10} align={'center'}>
@@ -104,7 +103,8 @@ export function Events() {
                 </Stack>
                 <Text color={'gray.600'}>
                     {event.remaining_ticket} tickets left
-                  </Text>
+                </Text>
+                <Ticketing detail={event}/>
               </Stack>
             </Box>
           )
