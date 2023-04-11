@@ -14,6 +14,8 @@ import {
   useNumberInput,
   Divider
 } from '@chakra-ui/react';
+import axios from "axios";
+import Swal from "sweetalert2";
 
 export const Ticketing = (props) => {
   const { getInputProps, getIncrementButtonProps, getDecrementButtonProps } =
@@ -42,6 +44,45 @@ export const Ticketing = (props) => {
     return `Rp${str}`;
   }
 
+  const submitTransaction = async (values) => {
+    try {
+        const token = localStorage.getItem("token");
+        const data = values;
+
+        console.log(data, token);
+
+        const config = {
+          headers: { Authorization: `Bearer ${token}` }
+        };
+        // const result = await axios.post('http://localhost:2000/transaction/create', data, config);
+
+        // Swal.fire({
+        //   icon: 'success',
+        //   title: result.data.message,
+        //   showConfirmButton: false,
+        //   timer: 1500
+        // })
+
+    } catch (err) {
+        console.log(err.response.data);
+        if (err.response.data) {
+          Swal.fire({
+            icon: 'error',
+            title: err.response.data.message,
+            showConfirmButton: false,
+            timer: 1500
+          })
+        } else {
+          Swal.fire({
+            icon: 'error',
+            title: err.response.data.errors[0].message,
+            showConfirmButton: false,
+            timer: 1500
+          })
+        }
+    }
+  }
+
   return (
     <Popover>
       <PopoverTrigger>
@@ -67,7 +108,10 @@ export const Ticketing = (props) => {
             <Divider my={3}></Divider>
             <HStack maxW='320px' my={2}>
               <Text fontSize={20}>Total Harga: {rupiah(props.detail.price * input.value)}</Text>
-              <Button colorScheme="green">Buy Now</Button>
+              <Button 
+                onClick={() => submitTransaction({event_id: props.detail.id, ticket_qty: input.value})}
+                colorScheme="green"
+              >Buy Now</Button>
             </HStack>
           </PopoverBody>
         </PopoverContent>
